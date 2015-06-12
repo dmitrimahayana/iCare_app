@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>iCare Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link href="css/bootstrap.min.css" rel="stylesheet">
+<link href="css/bootstrap-responsive.min.css" rel="stylesheet">
+<link href="http://fonts.googleapis.com/css?family=Open+Sans:400italic,600italic,400,600"
+        rel="stylesheet">
+<link href="css/font-awesome.css" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
+<link href="css/pages/dashboard.css" rel="stylesheet">
+<!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+<!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+</head>
+<body>
+<div class="navbar navbar-fixed-top">
+  <div class="navbar-inner">
+    <div class="container"> <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><span
+                    class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span> </a><a class="brand" href="index.html">iCare</a>
+      <div class="nav-collapse">
+        <ul class="nav pull-right">
+          <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown"><i
+                            class="icon-cog"></i> Akun <b class="caret"></b></a>
+            <ul class="dropdown-menu">
+              <li><a href="javascript:;location.href='profil.html';">Profil</a></li>
+              <li><a href="javascript:;">Help</a></li>
+              <li><a href="javascript:getLogOut();">Logout</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+      <!--/.nav-collapse --> 
+    </div>
+    <!-- /container --> 
+  </div>
+  <!-- /navbar-inner --> 
+</div>
+<!-- /navbar -->
+
+<div class="subnavbar">
+  <div class="subnavbar-inner">
+    <div class="container">
+      <ul class="mainnav">
+        <li class="active"><a href="index.html"><i class="icon-home"></i><span>Aktivitas</span></a></li>
+        <li><a href="siswa_dashboard.html"><i class="icon-list-alt"></i><span>Siswa</span></a></li>
+        <li><a href="progress.html"><i class="icon-bar-chart"></i><span>Progres</span></a></li>
+      </ul>
+    </div>
+    <!-- /container --> 
+  </div>
+  <!-- /subnavbar-inner --> 
+</div>
+<!-- /subnavbar -->
+
+<div class="main">
+  <div class="main-inner">
+    <div class="container">
+      <div class="row">
+      
+        <div class="span12">
+          <div class="widget">
+
+          <div class="widget">
+              <a id="backPage" class="btn btn-large btn-invert" href="aktivitas.html" ><i class="btn-icon-only icon-chevron-left"></i> Kembali</a>
+          </div>
+          <!-- /widget -->
+
+            <div class="widget-header"> <i class="icon-th-list"></i>
+              <h3>Rekomendasi Aktivitas</h3>
+            </div>
+            <!-- /widget-header -->
+            <div class="widget-content">
+                <div id="infoRec">
+                  <div class="alert alert-info">
+                      <button type="button" class="close" data-dismiss="alert">&times;</button>
+                      <strong>Info!</strong> rekomendasi aktivitas yang cocok untuk siswa berdasarkan hasil evaluasi
+		              </div>
+                </div>
+                <table class="table table-striped table-bordered">
+                    <thead>
+                        <tr>
+                        <th>No</th>
+                        <th>Tipe</th>
+                        <th>Nama</th>
+                        <th>Keterangan</th>
+                        <th>Rating</th>
+                        <!-- <th class="td-actions">Lihat Demo</th> -->
+                        <th class="td-actions">Kelola</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultData">
+                    </tbody>
+                </table>
+            </div>
+            <!-- /widget-content --> 
+          </div>
+          <!-- /widget --> 
+          
+        </div>
+        <!-- /span12 --> 
+      </div>
+      <!-- /row --> 
+    </div>
+    <!-- /container --> 
+  </div>
+  <!-- /main-inner --> 
+</div>
+
+<!-- Le javascript
+================================================== --> 
+<!-- Placed at the end of the document so the pages load faster --> 
+<script src="js/jquery-1.7.2.min.js"></script> 
+<script src="js/excanvas.min.js"></script> 
+<script src="js/chart.min.js" type="text/javascript"></script> 
+<script src="js/bootstrap.js"></script>
+
+<script type="text/javascript" src="js/model/siswa_model.js"></script>
+<script type="text/javascript" src="js/model/aktivitas_model.js"></script>
+<script type="text/javascript" src="js/model/rangkaian_aktivitas_model.js"></script>
+<script type="text/javascript" src="js/model/rank_model.js"></script>
+<script type="text/javascript" src="js/model/quicksort.js"></script>
+ 
+<script src="js/base.js"></script>
+<script>
+function getLogOut(){
+  localStorage.removeItem('isLogin');
+  localStorage.removeItem('id_user');
+  localStorage.removeItem('index_table');
+  localStorage.removeItem('is_terapist');
+  location.href='login.html';
+}
+
+function redirectPage(url, id){
+  localStorage.setItem("id_siswa_url", id);
+  location.href=url;
+}
+
+function redirectPageDetailAktivitas(url, id, id_aktivitas, number){
+  localStorage.setItem("id_siswa_url", id);
+  localStorage.setItem("id_aktivitas_url", id_aktivitas);
+  localStorage.setItem("number_url", number);
+  location.href=url;
+}
+
+var id = localStorage.getItem("id_siswa_url");
+
+$("#backPage").attr("href", "javascript:redirectPage('aktivitas.html', id)");
+
+  /*delete rank*/
+  // deleteDataRank(24); //DELETE MUST BE COMMENT AFTER SUCCESS
+  // var get_1_rank= getSomeRank(11, "id_siswa");
+  // for(var i=0; i<get_1_rank.length; i++){
+  //   console.log(i+" ==> id_rank:"+get_1_rank[i].id_rank+
+  //     " id_siswa:"+get_1_rank[i].id_siswa+
+  //     " id_date:"+get_1_rank[i].id_date+
+  //     " id_aktivitas:"+get_1_rank[i].id_aktivitas+
+  //     " rank:"+get_1_rank[i].rank+
+  //     " index:"+get_1_rank[i].index_table
+  //     );
+  // }
+  // console.log("\n");
+  /*edit rank*/
+  // var getOneRank= getSomeRank(27, "id_rank");
+  // var i=0;
+  // console.log("INI: id_rank:"+getOneRank[i].id_rank+" id_siswa:"+getOneRank[i].id_siswa+" id_date:"+getOneRank[i].id_date+" id_aktivitas:"+getOneRank[i].id_aktivitas+" rank:"+getOneRank[i].rank+" index:"+getOneRank[i].index_table);
+  // var dataDummy = JSON.stringify({ 
+  //     id_rank : getOneRank[0].id_rank,
+  //     id_siswa : getOneRank[0].id_siswa, 
+  //     id_date : getOneRank[0].id_date,
+  //     id_aktivitas : getOneRank[0].id_aktivitas,
+  //     rank : 7
+  // });
+  // editDataRank(getOneRank[i].index_table, dataDummy);
+
+var row_siswa;  //current row siswa
+var table_rank= []; //minimum 0 and max greater than zero
+var getAllStudents= getSomeSiswa(localStorage.getItem("id_user_login"), "id_user"); //get some students by user
+for(var j=0; j<getAllStudents.length; j++){
+  if(getAllStudents[j].id_siswa==id) row_siswa=j;
+  table_rank[j]= [];
+  var getAllAct= getAllAktivitas(); //get all aktivitas
+  for(var k=0; k<getAllAct.length; k++){
+    var getRessRank= getSomeRank(getAllStudents[j].id_siswa, "id_siswa"); //get rank by students
+    for(var i=0; i<getRessRank.length; i++){
+      if(getAllAct[k].id_aktivitas==getRessRank[i].id_aktivitas){
+        table_rank[j][k]= getRessRank[i].rank;
+      }
+      else {
+        if(typeof table_rank[j][k]=='undefined' || table_rank[j][k]=='null')
+          table_rank[j][k]= 0;
+      }
+      // console.log(" id_siswa:"+getRessRank[i].id_siswa+" id_rank:"+getRessRank[i].id_rank+" id_date:"+getRessRank[i].id_date+" id_aktivitas:"+getRessRank[i].id_aktivitas+" rank:"+getRessRank[i].rank+" index:"+getRessRank[i].index_table);
+    }
+    // if(table_rank[j][k]>0)
+    //   console.log(j+" "+k+" "+table_rank[j][k]+" "+getAllAct[k].nama_Aktivitas);
+  }
+  // console.losg("\n");
+}
+
+</script>
+<script type="text/javascript" src="js/model/recommendation.js"></script>
+<script>
+var getRessRank= getSomeRank(id, "id_siswa");
+var count=1;
+for(var i=0; i<getAllAct.length; i++){
+  if(typeof recomm_indexAct[i]!= 'undefined' && recomm[i]>=0){
+  console.log(i+" id_act:"+getAllAct[i].id_aktivitas+" "+getAllAct[i].nama_Aktivitas+" index:"+recomm_indexAct[i]+" "+recomm[i]);  //print to console
+    var getActDetail= getSomeAktivitas(getAllAct[i].id_aktivitas, "id_aktivitas");
+    drawContent(count, getAllAct[i].id_aktivitas, getActDetail[0].link_aktivitas, getActDetail[0].nama_Aktivitas, getActDetail[0].ket_aktivitas, recomm[i]); //draw the content
+    count++;
+  }
+}
+if(count==1){
+  $('#infoRec').html(
+    '<div class="alert">'+
+      '<button type="button" class="close" data-dismiss="alert">&times;</button>'+
+      '<strong>Info!</strong> belum ada rekomendasi yang cocok untuk siswa'+
+    '</div>'
+  );
+}
+
+function drawContent(count, id_aktivitas, link_aktivitas, nama_Aktivitas, ket_aktivitas, recomm_rating){
+  var type_aktivitas=link_aktivitas.split('_');
+  if(type_aktivitas[0].split(".h")[1]){
+    type_aktivitas[0]= type_aktivitas[0].split(".h")[0];
+    }
+  else {
+    type_aktivitas[0]= type_aktivitas[0];
+  }
+
+  if(type_aktivitas[0]=="angka") type_aktivitas[0]="matematika";
+  if(recomm_rating==100) recomm_rating=100;
+  $("#resultData").append(
+    "<tr>"+
+    "<td>"+count+"</td>"+
+    "<td>"+type_aktivitas[0]+"</td>"+
+    "<td>"+nama_Aktivitas+"</td>"+
+    "<td>"+ket_aktivitas+"</td>"+
+    "<td>"+recomm_rating+"%</td>"+
+    "<td class='td-actions'>"+
+      "<button style='width:100px;' class='"+id_aktivitas+" btn btn-primary' onclick='addRangkaianAct(\""+id_aktivitas+ "\")'><i class='btn-icon-only icon-plus'></i></button>"+
+    "</td>"+ 
+  "</tr>"); 
+
+  var dummy2= getSomeAnyParamRangkaianAktivitas(id, id_aktivitas, "id_siswa", "id_aktivitas"); //getRangkaianAktivitas some
+  if(dummy2!=null || dummy2!=''){
+    for(var x=0; x<dummy2.length; x++){
+      $('.'+dummy2[x].id_aktivitas).attr('disabled','disabled')
+    }
+  }
+}
+
+function checkAct(idAct, linkAct){
+    redirectPageDetailAktivitas('aktivities/'+linkAct, id, idAct, '../tambah_aktivitas.html', 'example');
+}
+  
+function addRangkaianAct(input){
+  var data = JSON.stringify({ 
+  id_siswa : id,
+  id_aktivitas : input,
+  is_active : 0,
+  urutan : 0
+  });
+  // console.log(input);
+  if(addDataRangkaianAktivitas(data)){
+    $('.'+input).attr('disabled','disabled');
+  }
+}
+</script>
+</body>
+</html>

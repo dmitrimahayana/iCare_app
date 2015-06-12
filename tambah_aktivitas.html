@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>iCare Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link href="css/bootstrap.min.css" rel="stylesheet">
+<link href="css/bootstrap-responsive.min.css" rel="stylesheet">
+<link href="http://fonts.googleapis.com/css?family=Open+Sans:400italic,600italic,400,600"
+        rel="stylesheet">
+<link href="css/font-awesome.css" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
+<link href="css/pages/dashboard.css" rel="stylesheet">
+<!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+<!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+</head>
+<body>
+<div class="navbar navbar-fixed-top">
+  <div class="navbar-inner">
+    <div class="container"> <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><span
+                    class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span> </a><a class="brand" href="index.html">iCare</a>
+      <div class="nav-collapse">
+        <ul class="nav pull-right">
+          <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown"><i
+                            class="icon-cog"></i> Akun <b class="caret"></b></a>
+            <ul class="dropdown-menu">
+              <li><a href="javascript:;location.href='profil.html';">Profil</a></li>
+              <li><a href="javascript:;">Help</a></li>
+              <li><a href="javascript:getLogOut();">Logout</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+      <!--/.nav-collapse --> 
+    </div>
+    <!-- /container --> 
+  </div>
+  <!-- /navbar-inner --> 
+</div>
+<!-- /navbar -->
+
+<div class="subnavbar">
+  <div class="subnavbar-inner">
+    <div class="container">
+      <ul class="mainnav">
+        <li class="active"><a href="index.html"><i class="icon-home"></i><span>Aktivitas</span></a></li>
+        <li><a href="siswa_dashboard.html"><i class="icon-list-alt"></i><span>Siswa</span></a></li>
+        <li><a href="progress.html"><i class="icon-bar-chart"></i><span>Progres</span></a></li>
+      </ul>
+    </div>
+    <!-- /container --> 
+  </div>
+  <!-- /subnavbar-inner --> 
+</div>
+<!-- /subnavbar -->
+
+<div class="main">
+  <div class="main-inner">
+    <div class="container">
+      <div class="row">
+      
+        <div class="span12">
+          <div class="widget">
+
+          <div class="widget">
+              <a id="backPage" class="btn btn-large btn-invert" href="aktivitas.html" ><i class="btn-icon-only icon-chevron-left"></i> Kembali</a>
+          </div>
+          <!-- /widget -->
+
+            <div class="widget-header"> <i class="icon-th-list"></i>
+              <h3>Daftar Semua Aktivitas</h3>
+            </div>
+            <!-- /widget-header -->
+            <div class="widget-content">
+				<div class="span4">
+					Level : 
+					<select id="kesulitan" name="kesulitan">
+						<option value="mudah">Mudah</option>
+						<option value="sedang">Sedang</option>
+						<option value="sulit">Sulit</option>
+					</select>
+				</div>
+				<div class="span4">
+					Jenis : 
+					<select id="jenis" name="jenis">
+						<option value="semua">Semua</option>
+						<option value="bahasa">Bahasa</option>
+						<option value="angka">Matematika</option>
+						<option value="lingkungan">Lingkungan</option>
+						<option value="mandiri">Mandiri</option>
+						<option value="sosial">Sosial</option>
+						<option value="puzzle">Puzzle</option>
+					</select>
+				</div>
+			    <table class="table table-striped table-bordered">
+                    <thead>
+                        <tr>
+                        <th>No</th>
+                        <th>Jenis</th>
+                        <th>Nama Aktivitas</th>
+                        <th>Keterangan</th>
+                        <th class="td-actions">Lihat Demo</th>
+                        <th class="td-actions">Tambah</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultData">
+                    </tbody>
+                </table>
+            </div>
+            <!-- /widget-content --> 
+          </div>
+          <!-- /widget --> 
+          
+        </div>
+        <!-- /span12 --> 
+      </div>
+      <!-- /row --> 
+    </div>
+    <!-- /container --> 
+  </div>
+  <!-- /main-inner --> 
+</div>
+
+<!-- Le javascript
+================================================== --> 
+<!-- Placed at the end of the document so the pages load faster --> 
+<script src="js/jquery-1.7.2.min.js"></script> 
+<script src="js/excanvas.min.js"></script> 
+<script src="js/chart.min.js" type="text/javascript"></script> 
+<script src="js/bootstrap.js"></script>
+<script language="javascript" type="text/javascript" src="js/full-calendar/fullcalendar.min.js"></script>
+ 
+<script src="js/base.js"></script>
+
+<script type="text/javascript" src="js/model/siswa_model.js"></script>
+<script type="text/javascript" src="js/model/aktivitas_model.js"></script>
+<script type="text/javascript" src="js/model/difficult_model.js"></script>
+<script type="text/javascript" src="js/model/rangkaian_aktivitas_model.js"></script>
+<script>
+function getLogOut(){
+  localStorage.removeItem('isLogin');
+  localStorage.removeItem('id_user_login');
+  localStorage.removeItem('index_table');
+  localStorage.removeItem('is_terapist');
+  location.href='login.html';
+}
+
+function redirectPage(url, id){
+  localStorage.setItem("id_siswa_url", id);
+  location.href=url;
+}
+
+function redirectPageDetailAktivitas(url, id, id_aktivitas, url_back_page, test){
+	localStorage.setItem("id_siswa_url", id);
+	localStorage.setItem("id_aktivitas_url", id_aktivitas);
+	localStorage.setItem("url_back_page", url_back_page);
+	localStorage.setItem("test", test);
+	location.href=url;
+}
+	
+var id = localStorage.getItem("id_siswa_url");
+
+$("#backPage").attr("href", "javascript:redirectPage('aktivitas.html', id)");
+
+var siswa= getSomeSiswa(id, 'id_siswa');
+$('#kesulitan option[value="'+siswa[0].kesulitan+'"]').attr("selected",true); 
+$('#jenis option[value="semua"]').attr("selected",true);
+
+//getAllDifficult();
+var count=0; 
+$("#resultData").html("");
+getListByLevel(siswa[0].kesulitan, 'bahasa');
+getListByLevel(siswa[0].kesulitan, 'angka');
+getListByLevel(siswa[0].kesulitan, 'lingkungan');
+getListByLevel(siswa[0].kesulitan, 'mandiri');
+getListByLevel(siswa[0].kesulitan, 'sosial');
+getListByLevel(siswa[0].kesulitan, 'puzzle');
+	
+
+$("#kesulitan").change(function(){ //change answer when input again
+	$("#resultData").html("");
+	count=0; 
+	if($("#jenis option:selected").val()=="semua"){
+		getListByLevel($("#kesulitan option:selected").val() ,'bahasa');
+		getListByLevel($("#kesulitan option:selected").val() ,'angka');
+		getListByLevel($("#kesulitan option:selected").val() ,'lingkungan');
+		getListByLevel($("#kesulitan option:selected").val() ,'mandiri');
+		getListByLevel($("#kesulitan option:selected").val() ,'sosial');
+		getListByLevel($("#kesulitan option:selected").val() ,'puzzle');
+	}
+	else {
+		getListByLevel($("#kesulitan option:selected").val() ,$("#jenis option:selected").val());
+	}
+});
+$("#jenis").change(function(){ //change answer when input again
+	$("#resultData").html("");
+	count=0; 
+	if($("#jenis option:selected").val()=="semua"){
+		getListByLevel($("#kesulitan option:selected").val() ,'bahasa');
+		getListByLevel($("#kesulitan option:selected").val() ,'angka');
+		getListByLevel($("#kesulitan option:selected").val() ,'lingkungan');
+		getListByLevel($("#kesulitan option:selected").val() ,'mandiri');
+		getListByLevel($("#kesulitan option:selected").val() ,'sosial');
+		getListByLevel($("#kesulitan option:selected").val() ,'puzzle');
+	}
+	else {
+		getListByLevel($("#kesulitan option:selected").val() ,$("#jenis option:selected").val());
+	}
+});
+
+// deleteAllRangkaianAktivitas();
+function getListByLevel(level,tipeAktivitas){
+	var dummyDiff= getSomeDifficult(level, 'level');
+	for(var j=0; j<dummyDiff.length; j++){
+		var dummy= getSomeAktivitas(dummyDiff[j].nama_aktivitas, 'nama_Aktivitas');
+		for(var i=0; i<dummy.length; i++){
+			var type_aktivitas=dummy[i].link_aktivitas.split('_');
+			if(type_aktivitas[0].split(".h")[1]){
+				type_aktivitas[0]= type_aktivitas[0].split(".h")[0];
+			  }
+			else {
+				type_aktivitas[0]= type_aktivitas[0];
+			}
+			if(type_aktivitas[0]==tipeAktivitas){
+				count= count+1;
+				if(type_aktivitas[0]=="angka") type_aktivitas[0]="matematika";
+				$("#resultData").append(
+					"<tr>"+
+					"<td>"+count+"</td>"+
+					"<td>"+type_aktivitas[0]+"</td>"+
+					"<td>"+dummy[i].nama_Aktivitas+"</td>"+
+					"<td>"+dummy[i].ket_aktivitas+"</td>"+
+					"<td class='td-actions'>"+
+						"<button class='"+dummy[i].id_aktivitas+" btn btn-primary' onclick='checkAct(\""+dummy[i].id_aktivitas+"\", \""+dummy[i].link_aktivitas+"\");'><i class='btn-icon-only icon-eye-open'></i></button>"+
+					"</td>"+ 
+					"<td class='td-actions'>"+
+					  "<button style='width:100px;' class='"+dummy[i].id_aktivitas+" btn btn-primary' onclick='addRangkaianAct(\""+dummy[i].id_aktivitas+ "\")'><i class='btn-icon-only icon-plus'></i></button>"+
+					"</td>"+ 
+				"</tr>"); 
+
+				var dummy2= getSomeAnyParamRangkaianAktivitas(id, dummy[i].id_aktivitas, "id_siswa", "id_aktivitas"); //getRangkaianAktivitas some
+				if(dummy2!=null || dummy2!=''){
+					for(var x=0; x<dummy2.length; x++){
+						$('.'+dummy2[x].id_aktivitas).attr('disabled','disabled');
+						$('.'+dummy2[x].id_aktivitas).attr('class','"+dummy[i].id_aktivitas+" btn btn-danger');
+					}
+				}
+			}
+		}
+	}
+}
+
+function checkAct(idAct, linkAct){
+    redirectPageDetailAktivitas('aktivities/'+linkAct, id, idAct, '../tambah_aktivitas.html', 'example');
+}
+  
+function addRangkaianAct(input){
+	var data = JSON.stringify({ 
+	id_siswa : id,
+	id_aktivitas : input,
+	urutan : 0
+	});
+	if(addDataRangkaianAktivitas(data)){
+		$('.'+input).attr('disabled','disabled');
+		$('.'+input).attr('class','"+dummy[i].id_aktivitas+" btn btn-danger');
+	}
+}
+
+</script>
+</body>
+</html>

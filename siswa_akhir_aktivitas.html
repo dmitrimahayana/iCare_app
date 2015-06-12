@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>iCare Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link href="css/bootstrap.min.css" rel="stylesheet">
+<link href="css/bootstrap-responsive.min.css" rel="stylesheet">
+<link href="http://fonts.googleapis.com/css?family=Open+Sans:400italic,600italic,400,600"
+        rel="stylesheet">
+<link href="css/font-awesome.css" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
+<link href="css/pages/dashboard.css" rel="stylesheet">
+<!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+<!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+</head>
+<body>
+<div class="navbar navbar-fixed-top">
+  <div class="navbar-inner">
+    <div class="container"> <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><span
+                    class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span> </a><a class="brand" href="index.html">iCare</a>
+      <div class="nav-collapse">
+        <ul class="nav pull-right">
+          <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown"><i
+                            class="icon-cog"></i> Konfigurasi Akun<b class="caret"></b></a>
+            <ul class="dropdown-menu">
+              <li><a href="javascript:;location.href='profil.html';">Profil</a></li>
+              <li><a href="javascript:;">Help</a></li>
+              <li><a href="javascript:getLogOut();">Logout</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+      <!--/.nav-collapse --> 
+    </div>
+    <!-- /container --> 
+  </div>
+  <!-- /navbar-inner --> 
+</div>
+<!-- /navbar -->
+
+<div class="subnavbar">
+  <div class="subnavbar-inner">
+    <div class="container">
+      <ul class="mainnav">
+        <li><a href="index.html"><i class="icon-home"></i><span>Aktivitas</span></a></li>
+        <li><a href="siswa_dashboard.html"><i class="icon-list-alt"></i><span>Siswa</span></a></li>
+        <li class="active"><a href="progress.html"><i class="icon-bar-chart"></i><span>Progres</span></a></li>
+      </ul>
+    </div>
+    <!-- /container --> 
+  </div>
+  <!-- /subnavbar-inner --> 
+</div>
+<!-- /subnavbar -->
+
+<div class="main">
+  <div class="main-inner">
+    <div class="container">
+      <div class="row">
+      
+        <div class="span12">
+          <div class="widget">
+            <div class="widget-header"> <i class="icon-th-list"></i>
+              <h3 id="nameH3"></h3>
+            </div>
+            <!-- /widget-header -->
+            <div class="widget-content">
+			    <table class="table table-striped table-bordered">
+              <h2 id="nameH1"></h2>
+              <h3 id="dateH3"></h3>
+                <thead>
+                    <tr>
+                    <th>No</th>
+                    <th>Nama Aktivitas</th>
+                    <th>Bisa / Tidak</th>
+                    </tr>
+                </thead>
+                <tbody id="resultData">
+
+                    <!-- <tr>
+                        <td colspan="2"><h3>Total Selesai</h3></td>
+                        <td><h3>4</h3></td>
+                    </tr> -->
+                </tbody>
+                </table>
+                <button class="btn btn-danger" onclick="reTesting()"><i class="btn-icon-only icon-play-circle"></i> Ulangi Lagi</button>
+                <button id="report" style="float:right;" class="btn btn-primary" onclick=""><i class="btn-icon-only icon-bar-chart"></i> OK</button>
+            </div>
+            <!-- /widget-content -->
+          </div>
+          <!-- /widget --> 
+          
+        </div>
+        <!-- /span12 --> 
+      </div>
+      <!-- /row --> 
+    </div>
+    <!-- /container --> 
+  </div>
+  <!-- /main-inner --> 
+</div>
+
+<!-- Le javascript
+================================================== --> 
+<!-- Placed at the end of the document so the pages load faster --> 
+<script src="js/jquery-1.7.2.min.js"></script> 
+<script src="js/excanvas.min.js"></script> 
+<script src="js/chart.min.js" type="text/javascript"></script> 
+<script src="js/bootstrap.js"></script>
+<script language="javascript" type="text/javascript" src="js/full-calendar/fullcalendar.min.js"></script>
+<script src="js/base.js"></script> 
+
+<script type="text/javascript" src="js/model/siswa_model.js"></script>
+<script type="text/javascript" src="js/model/aktivitas_model.js"></script>
+<script type="text/javascript" src="js/model/rangkaian_aktivitas_model.js"></script>
+<script type="text/javascript" src="js/model/nilai_model.js"></script>
+<script type="text/javascript" src="js/model/test_siswa_model.js"></script>
+<script type="text/javascript" src="js/model/rank_model.js"></script>
+<script>
+  function getLogOut(){
+    localStorage.removeItem('isLogin');
+    localStorage.removeItem('id_user_login');
+    localStorage.removeItem('index_table');
+    localStorage.removeItem('is_terapist');
+    location.href='login.html';
+  }
+
+  function redirectPage(url, id){
+    localStorage.setItem("id_siswa_url", id);
+    location.href=url;
+  }
+
+  localStorage.removeItem("id_aktivitas_url");
+  localStorage.removeItem("number_url");
+  localStorage.removeItem("test");
+
+  var id = localStorage.getItem("id_siswa_url");
+  var id_nilai = localStorage.getItem("id_date");
+
+  var datenowname= id_nilai.replace("_", "/");
+  datenowname= datenowname.replace("_", "/");
+  $( "#dateH3" ).text( datenowname );
+
+
+  $("#report").attr("onclick", "redirectPage('progress_grafik.html', "+id+")");
+
+  var dummy= getSomeSiswa(id, 'id_siswa');
+  if(dummy!=null || dummy!=''){
+    $( "#nameH3" ).text( 'Hasil Akhir Test '+' '+dummy[0].nama_siswa.toLowerCase() );
+    $( "#nameH1" ).text( dummy[0].nama_siswa.toUpperCase() );
+  }
+
+  // deleteAllNilai(); //delete all nilai
+
+  var countIsSolve= [];
+  var countNumberLine= 0;
+  filterJenis();
+
+  var tmp_count= countIsSolve[countIsSolve.length-1];
+  // for(var j=0; j<6; j++){
+  //   if(typeof countIsSolve[j]== 'undefined')
+  //     countIsSolve[j]=0;
+  //   tmp_count= tmp_count + countIsSolve[j];
+  // }
+
+  if(!tmp_count)
+    tmp_count= 0;
+  $('#resultData').append(
+  '<tr>'+
+      '<td colspan="2"><h3 style="float:right">Total Selesai</h3></td>'+
+      '<td><h3>'+tmp_count+'</h3></td>'+
+  '</tr>'
+  );
+
+  /*delete rank*/
+  // deleteDataRank(37);
+  /*edit rank*/
+  // var getOneRank= getSomeRank(27, "id_rank");
+  // var i=0;
+  // console.log("INI: id_rank:"+getOneRank[i].id_rank+" id_siswa:"+getOneRank[i].id_siswa+" id_date:"+getOneRank[i].id_date+" id_aktivitas:"+getOneRank[i].id_aktivitas+" rank:"+getOneRank[i].rank+" index:"+getOneRank[i].index_table);
+  // var dataDummy = JSON.stringify({ 
+  //     id_rank : getOneRank[0].id_rank,
+  //     id_siswa : getOneRank[0].id_siswa, 
+  //     id_date : getOneRank[0].id_date,
+  //     id_aktivitas : getOneRank[0].id_aktivitas,
+  //     rank : 7
+  // });
+  // editDataRank(getOneRank[i].index_table, dataDummy);
+  
+  console.log("\n");
+  console.log("date:"+id_nilai);
+  var getRessRank= getSomeRank(id, "id_siswa");
+  for(var i=0; i<getRessRank.length; i++){
+    console.log("id_rank:"+getRessRank[i].id_rank+" id_siswa:"+getRessRank[i].id_siswa+" id_date:"+getRessRank[i].id_date+" id_aktivitas:"+getRessRank[i].id_aktivitas+" rank:"+getRessRank[i].rank+" index:"+getRessRank[i].index_table);
+  }
+
+  function getListByJenis(tipeAktivitas, index_){
+    var dummy3= getSomeAnyParamRangkaianAktivitas(id, '1', 'id_siswa', 'is_active');
+    if(dummy3!=null || dummy3!=''){
+        for(var i=0; i<dummy3.length; i++){
+          var checkSolve;
+          var getNilaiSiswa= getSomeAnyParam3Nilai(id_nilai, id, dummy3[i].id_aktivitas, 'id_nilai', 'id_siswa', 'id_aktivitas');
+
+          if(Number(getNilaiSiswa[0].is_solve)==1){
+            if(typeof countIsSolve[index_]== 'undefined')
+              countIsSolve[index_]= 0;
+            countIsSolve[index_]= countIsSolve[index_] + 1;
+            checkSolve= '<i class="icon-large icon-ok" style="color:Green;"></i>';
+          }
+          else {
+            checkSolve= '<i class="icon-large icon-remove" style="color:red;"></i>';
+          }
+
+          var dummy2=  getSomeAktivitas(dummy3[i].id_aktivitas, 'id_aktivitas');
+          var type_aktivitas=dummy2[0].link_aktivitas.split('_');
+          if(type_aktivitas[0].split(".h")[1])
+            type_aktivitas[0]= type_aktivitas[0].split(".h")[0];
+          else 
+            type_aktivitas[0]= type_aktivitas[0];
+        
+          if(type_aktivitas[0]==tipeAktivitas){
+            countNumberLine= countNumberLine+1;
+            $("#resultData").append(
+              "<tr>"+
+                "<td>"+countNumberLine+"</td>"+
+                "<td>"+dummy2[0].nama_Aktivitas+"</td>"+
+                "<td>"+checkSolve+"</td>"+
+              "</tr>"); 
+          }
+      }
+    }
+  }
+    
+  function filterJenis(){
+    var dummy2 = getSomeAnyParamRangkaianAktivitas(id, "1", 'id_siswa', 'is_active')
+    var temp_aktivitas= [];
+    var jenis= new Array();
+    jenis[0]= 'bahasa';
+    jenis[1]= 'angka';
+    jenis[2]= 'lingkungan';
+    jenis[3]= 'mandiri';
+    jenis[4]= 'sosial';
+    jenis[5]= 'puzzle';
+    for (var j = 0; j < dummy2.length; j++) {
+        var dummy3 = getSomeAktivitas(dummy2[j].id_aktivitas, 'id_aktivitas');
+        var type_aktivitas=dummy3[0].link_aktivitas.split('_');
+        if(type_aktivitas[0].split(".h")[1])
+          type_aktivitas[0]= type_aktivitas[0].split(".h")[0];
+        else 
+          type_aktivitas[0]= type_aktivitas[0];
+        
+        switch (type_aktivitas[0]){
+          case jenis[0]:
+            temp_aktivitas[0]= 1;
+            break;
+          case jenis[1]:
+            temp_aktivitas[1]= 1;
+            break;
+          case jenis[2]:
+            temp_aktivitas[2]= 1;
+            break;
+          case jenis[3]:
+            temp_aktivitas[3]= 1;
+            break;
+          case jenis[4]:
+            temp_aktivitas[4]= 1;
+            break;
+          case jenis[5]:
+            temp_aktivitas[5]= 1;
+            break;
+        }
+    }
+
+    for(var j=0; j<6; j++){
+      if(temp_aktivitas[j]){
+        getListByJenis(jenis[j], j);
+      }
+    }
+  }
+
+  function reTesting(){
+    var r=confirm("Mulai test ulang?");
+    if (r==true){
+      testNow= getSomeAnyParamTestSiswa(id_nilai, id, 'id_test', 'id_siswa');
+      var j= 0; //first aktivitas
+      var ress= JSON.parse(testNow[0].list_rangkaian[j]);
+      console.log("ress: "+testNow[0].id_test+" "+testNow[0].id_siswa+" "+ress.id_aktivitas);
+      var ressDetail=  getSomeAktivitas(ress.id_aktivitas, 'id_aktivitas');
+      console.log("link: "+ressDetail[0].link_aktivitas+" OK");
+      redirectPageTest('aktivities/'+ressDetail[0].link_aktivitas, id, ress.id_aktivitas, j, 'test', id_nilai)
+    }
+  }
+
+  function redirectPageTest(url, id, id_aktivitas, number, test, id_date){
+    localStorage.setItem("id_siswa_url", id);
+    localStorage.setItem("id_aktivitas_url", id_aktivitas);
+    localStorage.setItem("number_url", number);
+    localStorage.setItem("test", test);
+    localStorage.setItem("id_date", id_date);
+    location.href=url;
+  }
+
+</script>
+</body>
+</html>

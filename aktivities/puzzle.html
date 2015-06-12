@@ -1,0 +1,461 @@
+<!doctype html> 
+<html lang="en"> 
+<head> 
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+    <title>Activities</title>
+	<script type="text/javascript" src="js/phaser.min.js"></script>
+    <script type="text/javascript" src="../phonegap.js"></script>
+    <script type="text/javascript">
+    var extension;
+    var my_media;
+	var answer_status= 1;
+
+    function playAudio(src) {
+        // alert('play: '+src);
+        my_media = new Media(src,
+        // success callback
+        function() {
+          console.log("playAudio():Audio Success");
+          releaseAudio();
+          // alert("playAudio():Audio Success");
+        },
+        // error callback
+        function(err) {
+          console.log("playAudio():Audio Error: " + err);
+          releaseAudio();
+          // alert("playAudio():Audio Error: " + err);
+        },
+        // status callback
+        function (status) {
+            // alert(status+" "+Media.MEDIA_STOPPED);
+            if (status === Media.MEDIA_STOPPED) {
+                setTimeout(function () {
+                    my_media.play();
+					if(answer_status==1){
+						my_media.setVolume('1.0');
+					}
+					else if(answer_status==0){
+						my_media.setVolume('0.0');
+					}
+                }, 2250);
+            }
+        }
+      );
+      // Play audio
+      my_media.play();
+    }
+
+    function stopAudio(){
+        my_media.stop(); //stop audio
+    }
+
+    function releaseAudio(){
+        my_media.release(); //release audio
+    }
+    </script>
+</head>
+<body>
+
+<script type="text/javascript">
+
+window.addEventListener('resize', function(event){
+    resizeGame();
+});
+var resizeGame = function () {
+    game.stage.scale.setShowAll();
+    game.stage.scale.refresh();
+}
+
+var SAFE_ZONE_WIDTH=600;
+var SAFE_ZONE_HEIGHT=400;
+var game = new Phaser.Game( SAFE_ZONE_WIDTH, SAFE_ZONE_HEIGHT, Phaser.AUTO, '',{ preload: preload, create: create, update: update });
+
+/*get from database*/
+var test= localStorage.getItem("test");
+var id= localStorage.getItem("id_siswa_url");
+var id_aktivitas= localStorage.getItem("id_aktivitas_url");
+var number= localStorage.getItem("number_url");
+var answerSiswa;
+var srcSoundAns;
+var id_date= localStorage.getItem("id_date");
+
+var isBig=1;
+
+function preload() {
+    var puzzle_full= 'assets/black_puzzle.jpg';
+    var puzzle1= 'assets/lingkungan/lingkungan_puzzle1.jpg';
+    var puzzle2= 'assets/lingkungan/lingkungan_puzzle2.jpg';
+    var puzzle3= 'assets/lingkungan/lingkungan_puzzle3.jpg';
+    var puzzle4= 'assets/lingkungan/lingkungan_puzzle4.jpg';
+    if(test=="test"){
+        /*get from database*/
+        var ressAct= getSomeAnyParamRangkaianAktivitas(id, id_aktivitas, 'id_siswa', 'id_aktivitas');
+        var param_siswa= ressAct[0].param_siswa.split(";;;");
+        for(var i=0; i<param_siswa.length; i++){
+            var tmp= param_siswa[i].split('=>');
+            console.log(i+" "+tmp[0]+"="+tmp[1]);
+            switch (tmp[0]){
+                case "isBig":
+                    isBig= tmp[1];
+                    break;
+                case "puzzle_full":
+                    puzzle_full= tmp[1];
+                    if(puzzle_full.search("./aktivities/")==0){
+                        puzzle_full= puzzle_full.replace("./aktivities/", "");
+                    }
+                    break;
+                case "puzzle1":
+                    puzzle1= tmp[1];
+                    if(puzzle1.search("./aktivities/")==0){
+                        puzzle1= puzzle1.replace("./aktivities/", "");
+                    }
+                    break;
+                case "puzzle2":
+                    puzzle2= tmp[1];
+                    if(puzzle2.search("./aktivities/")==0){
+                        puzzle2= puzzle2.replace("./aktivities/", "");
+                    }
+                    break;
+                case "puzzle3":
+                    puzzle3= tmp[1];
+                    if(puzzle3.search("./aktivities/")==0){
+                        puzzle3= puzzle3.replace("./aktivities/", "");
+                    }
+                    break;
+                case "puzzle4":
+                    puzzle4= tmp[1];
+                    if(puzzle4.search("./aktivities/")==0){
+                        puzzle4= puzzle4.replace("./aktivities/", "");
+                    }
+                    break;
+                case "file_suara":
+                    srcSoundAns= tmp[1];
+                    break;
+            }
+        }
+    }
+
+    game.load.image('puzzle_full', puzzle_full);
+    game.load.image('puzzle1', puzzle1);
+    game.load.image('puzzle2', puzzle2);
+    game.load.image('puzzle3', puzzle3);
+    game.load.image('puzzle4', puzzle4);
+
+    game.load.image('white', 'assets/white.png');
+    game.load.image('background', 'assets/background.jpg');
+
+    game.load.audio('success', ['assets/sound/applause-01.mp3']);
+    game.load.audio('fail', ['assets/sound/fail-trombone-01.mp3']);
+
+    game.stage.fullScreenScaleMode = Phaser.StageScaleMode.SHOW_ALL;
+    game.stage.scale.setShowAll();
+    game.stage.scale.pageAlignHorizontally = true;
+    game.stage.scale.pageAlignVeritcally = true;
+    game.stage.scale.refresh();
+}
+
+var items;
+var uniqueRandoms = [];
+var item= new Array();
+var content=new Object();
+    content.x= new Array();
+    content.y=  new Array();
+    content.index=  new Array();
+var ans;
+var check= new Array(); 
+var notEmpty= new Array();
+var timeCheck;
+var music;
+
+function create() {
+	// var isBig= 1;
+
+	var bg = game.add.sprite(0, 0, 'background');
+    bg.scale.setTo(2, 2);
+    
+    items = game.add.group();
+    var x=0, y=0, temp=0;
+    for (var i = 1; i <= 4; i++)
+    {
+        numberShow = makeUniqueRandom(4);
+        item[numberShow] = items.create(0 + temp, 0, 'puzzle'+numberShow, numberShow);
+        item[numberShow].width=120;
+        item[numberShow].height=120;
+        content.index[numberShow]=numberShow;
+
+        temp=temp+120;
+        // Enable input detection, then it's possible be dragged.
+        item[numberShow].input.start(0,true);
+        // Make this item draggable.
+        item[numberShow].input.enableDrag(false, true);
+        // Then we make it snap to 90x90 grids.
+        item[numberShow].input.enableSnap(120, 120, false, true);
+        // Add a handler to remove it using different options when dropped.
+        item[numberShow].events.onDragStop.add(dropHandler, { index: content.index[numberShow] });
+        notEmpty[i]=0;
+    }
+
+    ans= items.create(120, 120, 'puzzle_full');
+    ans.width=240;
+    ans.height=240;
+
+    var text = "Susun puzzle";
+	text= text.toLowerCase();
+	if(isBig==1){
+		text= text.toUpperCase();
+	}
+    var style = { font: "26px Arial", fill: "#000000", align: "center" };
+    var t = game.add.text(game.world.centerX+75, 220, text, style);
+
+    for (var i = 1; i <= 4; i++){
+        content.x[i]=item[i].x;
+        content.y[i]=item[i].y;
+    }
+
+    var platforms = game.add.group();
+    /*create skip*/
+    var styleSkip = { font: "20px Arial", fill: "#000000"};
+    var skipText = game.add.text(480, 373, "LEWATI >>>", styleSkip);
+    var skipBackground= platforms.create(skipText.x,skipText.y, 'white');
+    skipBackground.width= skipText.width;
+    skipBackground.height= skipText.height;
+    skipBackground.inputEnabled=true;
+    skipBackground.events.onInputDown.add(skip, this);
+
+}
+
+
+var coorX=120, coorY=120;
+function update() {
+    for (var i = 1; i <= 4; i++){
+        if(content.x[i]!=item[i].x || content.y[i]!=item[i].y){
+            if(content.x[i]==coorX && content.y[i]==coorY){
+                notEmpty[1]=0;
+            } else if(content.x[i]==coorX && content.y[i]==coorY+120){
+                notEmpty[2]=0;
+            } else if(content.x[i]==coorX+120 && content.y[i]==coorY){
+                notEmpty[3]=0;
+            } else if(content.x[i]==coorX+120 && content.y[i]==coorY+120){
+                notEmpty[4]=0;
+            }
+        }
+    }
+    /*if(check[1]==1 && check[2]==1 && check[3]==1 && check[4]==1){
+        // alert("success");
+        if (game.time.now - timeCheck > 6000)
+        {
+            next();
+            // window.location = "testing.html";
+        }
+        else
+        {
+            console.log("success");
+            //still waiting
+        }
+    }*/
+}
+
+
+
+
+function dropHandler(item){
+    var x=120, y=120;
+    for(var i = 1; i <= 4; i++){
+        if(item.x==x && item.y==y){
+            if(notEmpty[i]==1){
+                item.x=content.x[this.index];
+                item.y=content.y[this.index];
+            }
+            else {
+                content.x[this.index]=item.x;
+                content.y[this.index]=item.y;
+                if(this.index==i){
+                    check[this.index]=1;
+                }
+                notEmpty[i]=1;
+                
+            }
+        }
+        else if(item.x==0 || item.x>=360 || item.y==0 || item.y>=360){
+            content.x[this.index]=item.x;
+            content.y[this.index]=item.y;
+        }
+        if( y == 240){//max y
+                x = x+120;
+                y = 120;
+        }
+        else if(y!=240){
+            y = y+120;
+        }
+    }
+    if(notEmpty[1]==1 && notEmpty[2]==1 && notEmpty[3]==1 && notEmpty[4]==1){
+        if(check[1]==1 && check[2]==1 && check[3]==1 && check[4]==1){
+			answer_status= 0;
+            music = game.add.audio('success');
+            music.play();
+            timeSet();
+            
+            game.input.disabled = true;
+            goTo(1, 10);
+        }
+        else {
+            music = game.add.audio('fail');
+            music.play();
+        }
+    }
+}
+
+function next(inp1, inp2, inp3, inp4, inp5){
+    // console.log(inp1+" "+inp2+" "+inp3+" "+inp4+" "+inp5);
+    redirectPageTest(inp1, inp2, inp3, inp4, inp5)
+}
+
+function redirectPageTest(url, id, id_aktivitas, number, test){
+    localStorage.setItem("id_siswa_url", id);
+    localStorage.setItem("id_aktivitas_url", id_aktivitas);
+    localStorage.setItem("number_url", number);
+    localStorage.setItem("test", test);
+    location.href=url;
+}
+
+
+function makeUniqueRandom(numRandoms) {
+    // refill the array if needed
+    if (!uniqueRandoms.length) {
+        for (var i = 1; i <= numRandoms; i++) {
+            uniqueRandoms.push(i);
+        }
+    }
+    var index = Math.floor(Math.random() * uniqueRandoms.length);
+    var val = uniqueRandoms[index];
+
+    // now remove that value from the array
+    uniqueRandoms.splice(index, 1);
+    return val;
+}
+
+
+function timeSet() {
+    //do something
+    timeCheck = game.time.now;
+}
+
+</script>
+    <script type="text/javascript" src="../js/model/aktivitas_model.js"></script>
+    <script type="text/javascript" src="../js/model/rangkaian_aktivitas_model.js"></script>
+    <script type="text/javascript" src="../js/model/test_siswa_model.js"></script>
+    <script type="text/javascript" src="../js/model/nilai_model.js"></script>
+    <script type="text/javascript" src="../js/model/rank_model.js"></script>
+    <script>
+
+    function skip(){
+        var r=confirm("LEWATI ?");
+        if (r==true){
+			answer_status= 0;
+            x= goTo(0, 0);
+            game.input.disabled = true;
+        }
+        else{
+        // x="You pressed Cancel!";
+        } 
+    }
+
+    function goTo(inp_is_solve, score){
+        if(test=="test"){   //if test
+            /*save value activities*/
+            var getNilai= getSomeAnyParam3Nilai(id_date, id, id_aktivitas, 'id_nilai', 'id_siswa', 'id_aktivitas');
+            if(getNilai){
+                var data = JSON.stringify({ 
+                    id_nilai : getNilai[0].id_nilai,
+                    id_siswa : getNilai[0].id_siswa, 
+                    id_aktivitas : getNilai[0].id_aktivitas,
+                    is_solve : inp_is_solve,
+                    nilai : score
+                });
+                console.log(data);
+                editDataNilai(getNilai[0].index_table, data); //save score and today report
+            }
+            else {
+                console.log("new data: "+id_date+" "+id+" "+id_aktivitas+" "+inp_is_solve+" "+score);
+                addDataNilai(id_date, id, id_aktivitas, inp_is_solve, score)    //save score and today report
+            }
+            /*end value activities*/
+
+            /*save rank*/
+            var val_rank = inp_is_solve;
+            var get_valRank= getSomeAnyParam2Rank(id, id_aktivitas, "id_siswa", "id_aktivitas");
+            if(get_valRank){
+                console.log(get_valRank[0].id_date+"><"+id_date);
+                if(get_valRank[0].id_date != id_date){  //if date in db different with date now
+                    val_rank= get_valRank[0].rank + inp_is_solve;   //insert new rank
+                    console.log("rank new :"+val_rank);
+                }
+                else {  //if date in db same with date now
+                    val_rank= get_valRank[0].rank;  //insert old rank
+                    console.log("rank old :"+val_rank);
+                }
+                
+                var change_date= "";
+                if(inp_is_solve==1){    //if success solve
+                    console.log("is solve, date change "+inp_is_solve);
+                    change_date= id_date;   //insert new date
+                }
+                else {
+                    console.log("not solve, date not change");
+                    change_date= get_valRank[0].id_date;    //insert old date
+                }
+
+                var data = JSON.stringify({ 
+                    id_rank : get_valRank[0].id_rank,
+                    id_siswa : get_valRank[0].id_siswa, 
+                    id_date : change_date,
+                    id_aktivitas : get_valRank[0].id_aktivitas,
+                    rank : val_rank
+                });
+                console.log(data);
+                editDataRank(get_valRank[0].index_table, data)
+            }
+            else {
+                console.log("rank insert:"+val_rank);
+                if(inp_is_solve==1){
+                    console.log("is solve, date change "+inp_is_solve);
+                    addDataRank(id, id_date, id_aktivitas, val_rank);   //save for rank
+                }
+                else {
+                    console.log("not solve, date not change");
+                    addDataRank(id, "", id_aktivitas, val_rank);   //save for rank
+                }
+            }
+            /*end rank*/
+
+            testNow= getSomeAnyParamTestSiswa(id_date, id, 'id_test', 'id_siswa');
+            var j= Number(number)+1; //next aktivitas
+            if(testNow[0].list_rangkaian[j]){
+                var ress= JSON.parse(testNow[0].list_rangkaian[j]);
+                console.log("ress: "+testNow[0].id_test+" "+testNow[0].id_siswa+" "+ress.id_aktivitas);
+                var ressDetail=  getSomeAktivitas(ress.id_aktivitas, 'id_aktivitas');
+                console.log("link: "+ressDetail[0].link_aktivitas+" OK");
+                
+                setTimeout(function () {
+                    next(ressDetail[0].link_aktivitas, id, ress.id_aktivitas, j, 'test');
+                }, 3000);
+            }
+            else {
+                localStorage.setItem("id_siswa_url", id);
+                localStorage.setItem("id_date", id_date);
+                setTimeout(function () {
+                    location.href='../siswa_akhir_aktivitas.html';
+                }, 3000);
+            }
+        }
+        else {  //if example
+            localStorage.setItem("id_siswa_url", id);
+            localStorage.setItem("id_aktivitas_url", id_aktivitas);
+            var urlBak= localStorage.getItem("url_back_page");
+            location.href=urlBak;
+        }
+    }
+
+    </script>
+</body>
+</html>

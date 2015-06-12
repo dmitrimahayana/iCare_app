@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>iCare Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link href="css/bootstrap.min.css" rel="stylesheet">
+<link href="css/bootstrap-responsive.min.css" rel="stylesheet">
+<link href="http://fonts.googleapis.com/css?family=Open+Sans:400italic,600italic,400,600"
+        rel="stylesheet">
+<link href="css/font-awesome.css" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
+<link href="css/pages/dashboard.css" rel="stylesheet">
+<!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+<!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+</head>
+<body>
+<div class="navbar navbar-fixed-top">
+  <div class="navbar-inner">
+    <div class="container"> <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><span
+                    class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span> </a><a class="brand" href="index.html">iCare</a>
+      <div class="nav-collapse">
+        <ul class="nav pull-right">
+          <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown"><i
+                            class="icon-cog"></i> Konfigurasi Akun<b class="caret"></b></a>
+            <ul class="dropdown-menu">
+              <li><a href="javascript:;location.href='profil.html';">Profil</a></li>
+              <li><a href="javascript:;">Help</a></li>
+              <li><a href="javascript:;location.href='login.html';">Logout</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+      <!--/.nav-collapse --> 
+    </div>
+    <!-- /container --> 
+  </div>
+  <!-- /navbar-inner --> 
+</div>
+<!-- /navbar -->
+
+<div class="subnavbar">
+  <div class="subnavbar-inner">
+    <div class="container">
+      <ul class="mainnav">
+        <li><a href="index.html"><i class="icon-home"></i><span>Aktivitas</span></a></li>
+        <li><a href="siswa_dashboard.html"><i class="icon-list-alt"></i><span>Siswa</span></a></li>
+        <li><a href="progress.html"><i class="icon-bar-chart"></i><span>Progres</span></a></li>
+      </ul>
+    </div>
+    <!-- /container --> 
+  </div>
+  <!-- /subnavbar-inner --> 
+</div>
+<!-- /subnavbar -->
+
+<div class="main">
+  <div class="main-inner">
+    <div class="container">
+      <div class="row">
+      
+        <div class="span12">
+          <div class="widget">
+            <div class="widget-header"> <i class="icon-th-list"></i>
+              <h3>Profil Pengguna</h3>
+            </div>
+            <!-- /widget-header -->
+            <div class="widget-content">
+			    <table class="table" id="resultData">
+                    <!--<tr>
+                        <td colspan="3" rowspan="5">
+                            <img style="vertical-align:text-top;" alt="ava_default" src="img/ava_default.jpg" width="100" /><br />
+                            <button class="btn btn-primary" onclick="" disabled><i class="btn-icon-only icon-camera"></i> Upload</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Nama</td>
+                        <td><input type="text" name="username" class="span3 disabled" id="username" value="Dmitri Ivanovksy" disabled></td>
+                    </tr>
+                    <tr>
+                        <td>Email</td>
+                        <td><input type="text" name="email" class="span3 disabled" id="email" value="dmitri.mahayana@gmail.com" disabled></td>
+                    </tr>
+                    <tr>
+                        <td>Sebagai</td>
+                        <td>
+                        <select name="info_sebagai" disabled>
+                            <option value="1" selected="selected">Guru</option>
+                            <option value="2">Orang Tua</option>
+                        </select> 
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Password</td>
+                        <td><input type="password" name="password" class="span3 disabled" id="password" value="password" disabled></td>
+                    </tr>
+					-->
+                </table>
+                <button id="buttonEdit" class="btn btn-info" onclick="enableEdit();"><i class="btn-icon-only icon-edit"></i>Edit</button>
+                <button style="float:right" class="btn btn-success edit" onclick="saveNow();" disabled><i class="btn-icon-only icon-save"></i>Simpan</button>
+                
+            </div>
+            <!-- /widget-content --> 
+          </div>
+          <!-- /widget --> 
+          
+        </div>
+        <!-- /span12 --> 
+      </div>
+      <!-- /row --> 
+    </div>
+    <!-- /container --> 
+  </div>
+  <!-- /main-inner --> 
+</div>
+
+<!--<div class="footer">
+  <div class="footer-inner">
+    <div class="container">
+      <div class="row">
+        <div class="span12">&copy; 2014 Autis Care App</a>.</div>
+      </div>
+    </div>
+  </div>
+</div>-->
+
+<!-- Le javascript
+================================================== --> 
+<!-- Placed at the end of the document so the pages load faster --> 
+<script src="js/jquery-1.7.2.min.js"></script> 
+<script src="js/excanvas.min.js"></script> 
+<script src="js/chart.min.js" type="text/javascript"></script> 
+<script src="js/bootstrap.js"></script>
+<script language="javascript" type="text/javascript" src="js/full-calendar/fullcalendar.min.js"></script>
+<script src="js/base.js"></script> 
+
+<script type="text/javascript" src="js/model/user_model.js"></script>
+<script>
+	$("#resultData").append(
+		'<tr>'+
+			'<td colspan="3" rowspan="5">'+
+				'<img id="avaImage" style="vertical-align:text-top;" alt="ava_default" src="img/ava_default.jpg" width="120px"  /><br />'+
+				'<button id="buttonAvaImage" class="btn btn-primary edit" onclick="changeImage();" disabled><i class="btn-icon-only icon-camera"></i> Upload</button>'+
+			'</td>'+
+		'</tr>'
+	);
+	//getAll();img/ava_default.jpg
+	var result= getSome(localStorage.getItem("id_user_login"),'id_user');
+	console.log(result.photo_user+" "+result.is_terapist);
+	if(result.photo_user){
+		$('#avaImage').attr("src", result.photo_user);
+	}
+	$("#resultData").append(
+		'<tr>'+
+			'<td>Nama</td>'+
+			'<td><input type="text" name="username" class="span3 edit" id="username" value="'+result.username+'" disabled></td>'+
+		'</tr>'+
+		'<tr>'+
+			'<td>Email</td>'+
+			'<td><input type="text" name="email" class="span3 edit" id="email" value="'+result.email+'" disabled></td>'+
+		'</tr>'+
+		'<tr>'+
+			'<td>Sebagai</td>'+
+			'<td id="sebagaiUser">'+
+				'<select id="is_terapist" class="edit" name="is_terapist" disabled>'+
+					'<option value="1">Guru</option>'+
+					'<option value="0">Orang Tua</option>'+
+				'</select>'+
+			'</td>'+
+		'</tr>'+
+		'<tr>'+
+			'<td>Password</td>'+
+			'<td><input type="password" name="password" class="span3 edit" id="password" value="'+result.password+'" disabled></td>'+
+		'</tr>'
+	);
+	$('#is_terapist option[value="'+result.is_terapist+'"]').attr("selected",true);
+
+	function enableEdit(){
+		$('.edit').removeAttr('disabled');
+		$('#buttonEdit').attr('disabled','disabled');
+	}
+	
+	function changeImage(){
+		getCamera();
+	}
+	
+	function saveNow(){
+	//alert($("#is_terapist option:selected").val());
+		var data= JSON.stringify({ 
+			id_user : localStorage.getItem("id_user_login"), 
+			username : $('#username').val(), 
+			password : $('#password').val(), 
+			photo_user : $('#avaImage').attr("src"),
+			is_terapist : $("#is_terapist option:selected").val(),
+			email : $('#email').val()
+		});
+		editData(result.index_table, data);
+		$('#buttonEdit').removeAttr('disabled');
+		$('.edit').attr('disabled','disabled');
+	}
+</script>
+
+<!-- phonegap function -->
+<script type="text/javascript" src="phonegap.js"></script>
+<script>
+function exitAppNow(){
+	var x;
+    if (confirm("Apakah anda ingin keluar dari aplikasi?") == true) {   
+		// Exit the app!
+		navigator.app.exitApp();
+    }
+    else {
+        
+    }
+}
+
+function getCamera(){
+  //open camera and get image
+  navigator.camera.getPicture(onSuccess, onFail, { 
+      quality: 50,
+      destinationType: Camera.DestinationType.DATA_URL,
+      sourceType : Camera.PictureSourceType.CAMERA,
+      encodingType: Camera.EncodingType.JPEG,
+      /*targetWidth: 120,
+      targetHeight: 120,*/
+  });
+}
+
+function onSuccess(imageData) {
+  var imgSrc= "data:image/jpeg;base64," + imageData;
+  $('#avaImage').attr("src", imgSrc);
+  // image.src = "data:image/jpeg;base64," + imageData;
+  //width dan height < 120 maka tidak bisa menjadi 120px
+}
+
+function onFail(message) {
+    alert('Failed because: ' + message);
+}
+</script>
+
+</body>
+</html>

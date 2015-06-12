@@ -1,0 +1,474 @@
+<!doctype html> 
+<html lang="en"> 
+<head> 
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+    <title>Activities</title>
+	<script type="text/javascript" src="js/phaser.min.js"></script>
+    <script type="text/javascript" src="../phonegap.js"></script>
+    <script type="text/javascript">
+    var extension;
+    var my_media;
+	var answer_status= 1;
+
+    function playAudio(src) {
+        // alert('play: '+src);
+        my_media = new Media(src,
+        // success callback
+        function() {
+          console.log("playAudio():Audio Success");
+          releaseAudio();
+          // alert("playAudio():Audio Success");
+        },
+        // error callback
+        function(err) {
+          console.log("playAudio():Audio Error: " + err);
+          releaseAudio();
+          // alert("playAudio():Audio Error: " + err);
+        },
+        // status callback
+        function (status) {
+            // alert(status+" "+Media.MEDIA_STOPPED);
+            if (status === Media.MEDIA_STOPPED) {
+                setTimeout(function () {
+                    my_media.play();
+					if(answer_status==1){
+						my_media.setVolume('1.0');
+					}
+					else if(answer_status==0){
+						my_media.setVolume('0.0');
+					}
+                }, 2250);
+            }
+        }
+      );
+      // Play audio
+      my_media.play();
+    }
+
+    function stopAudio(){
+        my_media.stop(); //stop audio
+    }
+
+    function releaseAudio(){
+        my_media.release(); //release audio
+    }
+    </script>
+</head>
+<body>
+
+<script type="text/javascript">
+
+window.addEventListener('resize', function(event){
+    resizeGame();
+});
+var resizeGame = function () {
+    game.stage.scale.setShowAll();
+    game.stage.scale.refresh();
+}
+
+var SAFE_ZONE_WIDTH=600;
+var SAFE_ZONE_HEIGHT=400;
+var game = new Phaser.Game( SAFE_ZONE_WIDTH, SAFE_ZONE_HEIGHT, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+
+function preload() {
+    game.load.image('white', 'assets/white.png');
+	game.load.image('1', 'assets/matematika/angka_bola_hitung_1.jpg');
+	game.load.image('2', 'assets/matematika/angka_bola_hitung_2.jpg');
+	game.load.image('3', 'assets/matematika/angka_bola_hitung_3.jpg');
+	game.load.image('4', 'assets/matematika/angka_bola_hitung_4.jpg');
+    game.load.image('5', 'assets/matematika/angka_bola_hitung_5.jpg');
+    game.load.image('6', 'assets/matematika/angka_bola_hitung_6.jpg');
+    game.load.image('7', 'assets/matematika/angka_bola_hitung_7.jpg');
+    game.load.image('8', 'assets/matematika/angka_bola_hitung_8.jpg');
+    game.load.image('9', 'assets/matematika/angka_bola_hitung_9.jpg');
+	game.load.image('background', 'assets/background.jpg');
+
+    game.load.audio('success', 'assets/sound/applause-01.mp3');
+    game.load.audio('fail', 'assets/sound/fail-trombone-01.mp3');
+
+    game.stage.fullScreenScaleMode = Phaser.StageScaleMode.SHOW_ALL;
+    game.stage.scale.setShowAll();
+    game.stage.scale.pageAlignHorizontally = true;
+    game.stage.scale.pageAlignVeritcally = true;
+    game.stage.scale.refresh();
+}
+
+var platforms;
+var score = 0;
+var scoreText;
+var images = new Array();
+var uniqueRandoms = [];
+var randomNumber = [];
+
+var huruf= [];
+var textHuruf= [];
+var styleTextHuruf= [];
+
+var content=new Object();
+    content.count= new Array();
+    content.numbShow=  new Array();
+var questionNumber;
+var timeCheck;
+var timeCheckErrors;
+var answerCheck;
+var choice = new Array();
+var music;
+
+/*get from database*/
+var test= localStorage.getItem("test");
+var id= localStorage.getItem("id_siswa_url");
+var id_aktivitas= localStorage.getItem("id_aktivitas_url");
+var number= localStorage.getItem("number_url");
+var id_date= localStorage.getItem("id_date");
+var answerSiswa;
+var countDiff;
+var srcSoundAns;
+
+function create() {
+
+    var start=1;   //min number start 1
+    var end=4;     //max number end 9
+    var isBig=1;
+	var txt_yg_dihitung= "bola";
+    
+    if(test=="test"){
+        countDiff= 0;
+        /*get from database*/
+        var ressAct= getSomeAnyParamRangkaianAktivitas(id, id_aktivitas, 'id_siswa', 'id_aktivitas');
+        var param_siswa= ressAct[0].param_siswa.split(";;;");
+        for(var i=0; i<param_siswa.length; i++){
+            var tmp= param_siswa[i].split('=>');
+            console.log(i+" "+tmp[0]+" "+tmp[1]);
+            switch (tmp[0]){
+                case "start":
+                    start= Number(tmp[1]);
+                    break;
+                case "end":
+                    end= Number(tmp[1]);
+                    break;
+                case "isBig":
+                    isBig= tmp[1];
+                    answerSiswa= ressAct[0].answer_siswa;
+                    break;
+                case "file_suara":
+                    if(localStorage.getItem("is_sound")=='suara_teks' || localStorage.getItem("is_sound")=='suara'){
+                        playAudio(tmp[1]);
+                    }
+                    break;
+            }
+        }
+    }
+
+    var setNumQuestion= Math.floor(Math.random() * 4) + 1;//set question number
+    questionNumber=setNumQuestion;
+
+	var bg = game.add.sprite(0, 0, 'background');
+    bg.scale.setTo(1.2, 1.2);
+
+    var color= [];
+    color[1]= "#009933";
+    color[2]= "#FF0000";
+    color[3]= "#0000FF";
+    color[4]= "#FF00FF";
+    
+    var numberRand= [];
+    var numberShow;
+    var x =0;
+    var y =0;
+    var count=4;//jumlah soal
+    platforms = game.add.group();
+    for (var i = 1; i <= count; i++) {
+		numberRand[i]= generateNumb(start, end, end-start);
+        if(test=="test"){   //if test
+            if(numberRand[i]==answerSiswa){  //if now number question
+                numberRand[i] = answerSiswa;    //set new answer
+                setNumQuestion= i;//set question number
+                questionNumber=setNumQuestion;
+            }
+            else if(numberRand[i]!=answerSiswa){
+                countDiff++;
+            }
+            if(countDiff==4){
+                numberRand[setNumQuestion] = answerSiswa;    //set new answer
+            }
+        }
+    }
+
+    for (var i = 1; i <= count; i++) {
+        numberShow = makeUniqueRandom(4);
+        choice[i] = platforms.create(x+125, y+85, ''+numberRand[i]+'');
+        content.count[i]=i;
+        content.numbShow[i]=i;
+        choice[i].inputEnabled=true;
+        choice[i].events.onInputDown.add(check, { count: content.count[i], numbshow: content.numbShow[i], name:numberRand[i] });
+        if( y == 160){//max y
+                x = x+175;
+                y = 0;
+        }
+        else if(y!=160){
+            y = y+160;
+        }
+    }
+    
+    if(localStorage.getItem("is_sound")=='teks' || localStorage.getItem("is_sound")=='suara_teks'){
+        var temp= "Sentuh "+txt_yg_dihitung;
+        temp=temp.toLowerCase()
+        if(isBig==1){
+            temp=temp.toUpperCase()
+        }
+        var text = temp+" "+numberRand[setNumQuestion];
+        var style = { font: "50px Arial", fill: "#000000" };
+        var t = game.add.text(game.world.centerX-170, 15, text, style);
+        t.x= (bg.width-50)/2-t.width/2;
+    }
+
+    /*create skip*/
+    var styleSkip = { font: "20px Arial", fill: "#000000"};
+    var skipText = game.add.text(bg.width-125, bg.height-58, "LEWATI >>>", styleSkip);
+    var skipBackground= platforms.create(skipText.x,skipText.y, 'white');
+    skipBackground.width= skipText.width;
+    skipBackground.height= skipText.height;
+    skipBackground.inputEnabled=true;
+    skipBackground.events.onInputDown.add(skip, this);
+}
+ 
+function update() {
+    // if(answerCheck==1){
+    //     if (game.time.now - timeCheck > 4000)
+    //     {
+    //         window.location = "testing.html";
+    //     }
+    //     else
+    //     {
+    //         console.log("success");
+    //         //still waiting
+    //     }
+    // }
+    // else if(answerCheck==0) {
+    //     if (game.time.now - timeCheckErrors > 4000)
+    //     {
+    //         for(var i=1; i<=4; i++){
+    //             choice[i].inputEnabled=true;
+    //         }
+    //         answerCheck=null;
+    //     }
+    //     else
+    //     {
+    //         for(var i=1; i<=4; i++){
+    //             choice[i].inputEnabled=false;
+    //         }
+    //         //still waiting
+    //     }
+    // }
+}
+
+function check()
+{
+    if(questionNumber==this.numbshow){//jika jawaban benar
+		answer_status= 0;
+        music = game.add.audio('success');
+        music.play();
+        timeSet();
+        alert("jawaban benar "+this.name);
+
+        game.input.disabled = true;
+        goTo(1, 10);
+
+    }
+    else {
+        music = game.add.audio('fail');
+        music.play();
+        alert("jawaban salah");
+
+        for (i in choice){
+            choice[i].inputEnabled=false;
+        }
+        setTimeout(function () {
+            for (i in choice){
+                choice[i].inputEnabled=true;
+            }
+        }, 3000);
+    }
+}
+
+function skip(){
+    var r=confirm("LEWATI ?");
+    if (r==true){
+		answer_status= 0;
+        game.input.disabled = true;
+        goTo(0, 0);
+    }
+}
+
+function goTo(inp_is_solve, score){
+    if(test=="test"){   //if test
+        /*save value activities*/
+        var getNilai= getSomeAnyParam3Nilai(id_date, id, id_aktivitas, 'id_nilai', 'id_siswa', 'id_aktivitas');
+        if(getNilai){
+            var data = JSON.stringify({ 
+                id_nilai : getNilai[0].id_nilai,
+                id_siswa : getNilai[0].id_siswa, 
+                id_aktivitas : getNilai[0].id_aktivitas,
+                is_solve : inp_is_solve,
+                nilai : score
+            });
+            console.log(data);
+            editDataNilai(getNilai[0].index_table, data); //save score and today report
+        }
+        else {
+            console.log("new data: "+id_date+" "+id+" "+id_aktivitas+" "+inp_is_solve+" "+score);
+            addDataNilai(id_date, id, id_aktivitas, inp_is_solve, score)    //save score and today report
+        }
+        /*end value activities*/
+
+        /*save rank*/
+        var val_rank = inp_is_solve;
+        var get_valRank= getSomeAnyParam2Rank(id, id_aktivitas, "id_siswa", "id_aktivitas");
+        if(get_valRank){
+            console.log(get_valRank[0].id_date+"><"+id_date);
+            if(get_valRank[0].id_date != id_date){  //if date in db different with date now
+                val_rank= get_valRank[0].rank + inp_is_solve;   //insert new rank
+                console.log("rank new :"+val_rank);
+            }
+            else {  //if date in db same with date now
+                val_rank= get_valRank[0].rank;  //insert old rank
+                console.log("rank old :"+val_rank);
+            }
+            
+            var change_date= "";
+            if(inp_is_solve==1){    //if success solve
+                console.log("is solve, date change "+inp_is_solve);
+                change_date= id_date;   //insert new date
+            }
+            else {
+                console.log("not solve, date not change");
+                change_date= get_valRank[0].id_date;    //insert old date
+            }
+
+            var data = JSON.stringify({ 
+                id_rank : get_valRank[0].id_rank,
+                id_siswa : get_valRank[0].id_siswa, 
+                id_date : change_date,
+                id_aktivitas : get_valRank[0].id_aktivitas,
+                rank : val_rank
+            });
+            console.log(data);
+            editDataRank(get_valRank[0].index_table, data)
+        }
+        else {
+            console.log("rank insert:"+val_rank);
+            if(inp_is_solve==1){
+                console.log("is solve, date change "+inp_is_solve);
+                addDataRank(id, id_date, id_aktivitas, val_rank);   //save for rank
+            }
+            else {
+                console.log("not solve, date not change");
+                addDataRank(id, "", id_aktivitas, val_rank);   //save for rank
+            }
+        }
+        /*end rank*/
+
+        testNow= getSomeAnyParamTestSiswa(id_date, id, 'id_test', 'id_siswa');
+        var j= Number(number)+1; //next aktivitas
+        if(testNow[0].list_rangkaian[j]){
+            var ress= JSON.parse(testNow[0].list_rangkaian[j]);
+            console.log("ress: "+testNow[0].id_test+" "+testNow[0].id_siswa+" "+ress.id_aktivitas);
+            var ressDetail=  getSomeAktivitas(ress.id_aktivitas, 'id_aktivitas');
+            console.log("link: "+ressDetail[0].link_aktivitas+" OK");
+            
+            setTimeout(function () {
+                if(localStorage.getItem("is_sound")=='suara_teks' || localStorage.getItem("is_sound")=='suara'){
+                    stopAudio();
+                    releaseAudio();
+                }
+                next(ressDetail[0].link_aktivitas, id, ress.id_aktivitas, j, 'test');
+            }, 3000);
+        }
+        else {
+            localStorage.setItem("id_siswa_url", id);
+            localStorage.setItem("id_date", id_date);
+            setTimeout(function () {
+                if(localStorage.getItem("is_sound")=='suara_teks' || localStorage.getItem("is_sound")=='suara'){
+                    stopAudio();
+                    releaseAudio();
+                }
+                location.href='../siswa_akhir_aktivitas.html';
+            }, 3000);
+        }        
+    }
+    else {  //if example
+        localStorage.setItem("id_siswa_url", id);
+        localStorage.setItem("id_aktivitas_url", id_aktivitas);
+        var urlBak= localStorage.getItem("url_back_page");
+        location.href=urlBak;
+    }
+}
+
+function next(inp1, inp2, inp3, inp4, inp5){
+    // console.log(inp1+" "+inp2+" "+inp3+" "+inp4+" "+inp5);
+    redirectPageTest(inp1, inp2, inp3, inp4, inp5)
+}
+
+function redirectPageTest(url, id, id_aktivitas, number, test){
+    localStorage.setItem("id_siswa_url", id);
+    localStorage.setItem("id_aktivitas_url", id_aktivitas);
+    localStorage.setItem("number_url", number);
+    localStorage.setItem("test", test);
+    location.href=url;
+}
+
+function generateNumb(start, end, range) {
+    // refill the array if needed
+	//range=
+    if (!randomNumber.length) {
+        for(var i=0; i<=range; i++){
+			if(i==0){
+				randomNumber[0]=start;
+			}
+			else {
+				randomNumber[i]=randomNumber[i-1]+1;
+			}
+			//console.log(randomNumber[i]);
+        }
+    }
+    // console.log("array:"+randomNumber)
+    var index = Math.floor(Math.random() * randomNumber.length);
+    var val = randomNumber[index];
+	
+	// console.log("ini:"+val+" index:"+index);
+    // now remove that value from the array
+    randomNumber.splice(index, 1);
+
+    return val;
+}
+
+function makeUniqueRandom(numRandoms) {
+    // refill the array if needed
+    if (!uniqueRandoms.length) {
+        for (var i = 1; i <= numRandoms; i++) {
+            uniqueRandoms.push(i);
+        }
+    }
+    var index = Math.floor(Math.random() * uniqueRandoms.length);
+    var val = uniqueRandoms[index];
+
+    // now remove that value from the array
+    uniqueRandoms.splice(index, 1);
+
+    return val;
+}
+
+function timeSet() {
+    //do something
+    timeCheck = game.time.now;
+}
+
+</script>
+    <script type="text/javascript" src="../js/model/aktivitas_model.js"></script>
+    <script type="text/javascript" src="../js/model/rangkaian_aktivitas_model.js"></script>
+    <script type="text/javascript" src="../js/model/test_siswa_model.js"></script>
+    <script type="text/javascript" src="../js/model/nilai_model.js"></script>
+    <script type="text/javascript" src="../js/model/rank_model.js"></script>
+
+</body>
+</html>

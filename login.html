@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+  
+<head>
+    <meta charset="utf-8">
+    <title>Login</title>
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes"> 
+    
+<link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+<link href="css/bootstrap-responsive.min.css" rel="stylesheet" type="text/css" />
+
+<link href="css/font-awesome.css" rel="stylesheet">
+    <link href="http://fonts.googleapis.com/css?family=Open+Sans:400italic,600italic,400,600" rel="stylesheet">
+    
+<link href="css/style.css" rel="stylesheet" type="text/css">
+<link href="css/pages/signin.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body>
+	
+	<div class="navbar navbar-fixed-top">
+	
+	<div class="navbar-inner">
+		
+		<div class="container">
+			
+			<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</a>
+			
+			<a class="brand" href="index.html">
+				iCare				
+			</a>		
+			
+			<div class="nav-collapse">
+				<div class="nav pull-right">
+				  <li class="dropdown">
+					<a href="javascript:exitAppNow();" class="dropdown-toggle">
+					<i class="icon-remove"></i> Keluar Dari Aplikasi</a>
+				  </li>
+				</div>
+				<ul class="nav pull-right">
+					
+					<li class="">						
+						<a href="signup.html" class="">
+							<i class="icon-user"></i> Daftar baru disini
+						</a>
+						
+					</li>
+				</ul>
+				
+			</div><!--/.nav-collapse -->	
+	
+		</div> <!-- /container -->
+		
+	</div> <!-- /navbar-inner -->
+	
+</div> <!-- /navbar -->
+
+
+
+<div class="account-container">
+	
+	<div class="content clearfix">
+		
+
+		
+			<h1>Login</h1>		
+			
+			<div class="login-fields">
+				<div id="error" class="alert alert-danger" style="display:none;">
+                    <!--<button type="button" class="close" data-dismiss="alert">&times;</button>-->
+                    <strong>Error!</strong> gagal login silahkan ulangi lagi
+	            </div>
+
+				<div class="field">
+					<label for="username">Username</label>
+					<input type="text" id="username" name="username" value="" placeholder="Username" class="login username-field" />
+				</div> <!-- /field -->
+				
+				<div class="field">
+					<label for="password">Password:</label>
+					<input type="password" id="password" name="password" value="" placeholder="Password" class="login password-field"/>
+				</div> <!-- /password -->
+				
+			</div> <!-- /login-fields -->
+			
+			<div class="login-actions">
+				<br />
+				<button onclick="getLogin()" style="float:right;" class="btn btn-success btn-large" >Sign In</button>
+                <button  class="btn btn-primary btn-large" onclick="location.href='forget_password.html';">Lupa Password</button> 
+				
+			</div> <!-- .actions -->
+			
+			
+			
+
+		
+	</div> <!-- /content -->
+	
+</div> <!-- /account-container -->
+
+<script src="js/jquery-1.7.2.min.js"></script>
+<script src="js/bootstrap.js"></script>
+<script type="text/javascript" src="js/model/user_model.js"></script>
+
+<!--<script src="js/signin.js"></script>-->
+<script>
+// var tmpAll= getAll();
+// for(var i=0; i<tmpAll.length; i++){
+// 	console.log("index:"+tmpAll[i].index_table+" id:"+tmpAll[i].id_user+" "+tmpAll[i].username+" terapist:"+tmpAll[i].is_terapist);
+// }
+
+function getLogin(){
+	var result= getSomeAnyParam($("#username").val().toLowerCase(), $("#password").val().toLowerCase(), 'username', 'password');
+	if(result==null || $("#username").val()=="" || $("#password").val()==""){
+		document.getElementById('error').style.display = "block";
+	}
+	else {
+		document.getElementById('error').style.display = "none";
+		localStorage.setItem("isLogin", 1);
+		localStorage.setItem("id_user_login", result.id_user);
+		localStorage.setItem("index_table", result.index_table);
+		localStorage.setItem("is_terapist", result.is_terapist);
+		//alert("index:"+result.index_table+" id:"+result.id_user+" "+result.username+" terapist:"+result.is_terapist);
+  		location.href='index.html';
+	}
+}
+
+</script>
+
+<!-- phonegap function -->
+<script type="text/javascript" src="phonegap.js"></script>
+<script>
+function exitAppNow(){
+	var x;
+    if (confirm("Apakah anda ingin keluar dari aplikasi?") == true) {   
+		// Exit the app!
+		navigator.app.exitApp();
+    }
+    else {
+        
+    }
+}
+</script>
+
+</body>
+
+</html>

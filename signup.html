@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+  
+ <head>
+    <meta charset="utf-8">
+    <title>Signup</title>
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes"> 
+    
+<link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+<link href="css/bootstrap-responsive.min.css" rel="stylesheet" type="text/css" />
+
+<link href="css/font-awesome.css" rel="stylesheet">
+    <link href="http://fonts.googleapis.com/css?family=Open+Sans:400italic,600italic,400,600" rel="stylesheet">
+    
+<link href="css/style.css" rel="stylesheet" type="text/css">
+<link href="css/pages/signin.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body>
+	
+	<div class="navbar navbar-fixed-top">
+	
+	<div class="navbar-inner">
+		
+		<div class="container">
+			
+			<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</a>
+			
+			<a class="brand" href="index.html">
+				iCare				
+			</a>		
+			
+			
+			</div><!--/.nav-collapse -->	
+	
+		</div> <!-- /container -->
+		
+	</div> <!-- /navbar-inner -->
+	
+</div> <!-- /navbar -->
+
+
+
+<div class="account-container register">
+	
+	<div class="content clearfix">
+		
+		
+			<h1>Silahkan Lakukan Pendaftaran</h1>			
+			
+			<div class="login-fields">
+				<div id="errorPass" class="alert alert-danger" style="display:none;">
+                    <!--<button type="button" class="close" data-dismiss="alert">&times;</button>-->
+                    <strong>Error!</strong> password dan konfirmasi Password harus sama
+	            </div>
+	            <div id="errorCheck" class="alert alert-danger" style="display:none;">
+                    <!--<button type="button" class="close" data-dismiss="alert">&times;</button>-->
+                    <strong>Error!</strong> setujui aturan dan kondisi terlebih dahulu
+	            </div>
+	            <div id="errorUsername" class="alert alert-danger" style="display:none;">
+                    <!--<button type="button" class="close" data-dismiss="alert">&times;</button>-->
+                    <strong>Error!</strong> nama sudah terdaftar
+	            </div>
+	            <div id="errorEmail" class="alert alert-danger" style="display:none;">
+                    <!--<button type="button" class="close" data-dismiss="alert">&times;</button>-->
+                    <strong>Error!</strong> email sudah terdaftar
+	            </div>
+				
+				<div class="field">
+					<label for="username">Nama:</label>
+					<input type="text" id="username" name="username" value="" placeholder="Nama" class="login" />
+				</div> <!-- /field -->
+				
+                <div class="field">
+					<label for="is_terapist">Sebagai:</label>
+                    <select id="is_terapist" name="is_terapist">
+                        <option value="1">Guru</option>
+                        <option value="0">Orang Tua</option>
+                    </select> 
+                </div> <!-- /field -->
+
+				<div class="field">
+					<label for="email">Email:</label>
+					<input type="text" id="email" name="email" value="" placeholder="Email" class="login"/>
+				</div> <!-- /field -->
+				
+				<div class="field">
+					<label for="password">Password:</label>
+					<input type="password" id="password" name="password" value="" placeholder="Password" class="login"/>
+				</div> <!-- /field -->
+				
+				<div class="field">
+					<label for="confirm_password">Konfirmasi Password:</label>
+					<input type="password" id="confirm_password" name="confirm_password" value="" placeholder="Konfirmasi Password" class="login"/>
+				</div> <!-- /field -->
+				
+			</div> <!-- /login-fields -->
+			
+			<div class="login-actions">
+				
+				<span class="login-checkbox">
+					<input id="Field" name="Field" type="checkbox" class="field login-checkbox" />
+					<label class="choice" for="Field">Setuju dengan Aturan dan Kondisi</label>
+				</span>
+									
+				<button class="button btn btn-primary btn-large" onclick="checkSignUp()">Daftar</button>
+				
+			</div> <!-- .actions -->
+			
+		
+	</div> <!-- /content -->
+	
+</div> <!-- /account-container -->
+
+
+<!-- Text Under Box -->
+<div class="login-extra">
+	Sudah punya akun? <a href="login.html">Login akun anda</a>
+</div> <!-- /login-extra -->
+
+
+<script src="js/jquery-1.7.2.min.js"></script>
+<script src="js/bootstrap.js"></script>
+
+
+<script type="text/javascript" src="js/model/user_model.js"></script>
+<script>
+
+function checkSignUp(){
+	var pass1= $("#password").val().toLowerCase();
+	var pass2= $("#confirm_password").val().toLowerCase();
+	if(pass1!=pass2 || pass1==""){	//jika password dan konfirmasi password tidak sama
+		document.getElementById('errorPass').style.display = "block";
+	}
+	else {
+		document.getElementById('errorPass').style.display = "none";
+		if ($('#Field').is(":checked"))	//jika dicek
+		{
+			document.getElementById('errorCheck').style.display = "none";
+			var cekUsername= getSome($("#username").val().toLowerCase(),'username');
+			if(cekUsername==null && $("#username").val()!=""){
+				document.getElementById('errorUsername').style.display = "none";
+				var result= getSome($("#email").val().toLowerCase(),'email');
+				if(result==null){	//jika email unik
+					document.getElementById('errorEmail').style.display = "none";
+					addData();
+					location.href='login.html';
+				}
+				else {
+					document.getElementById('errorEmail').style.display = "block";
+				}
+			}
+			else {
+				document.getElementById('errorUsername').style.display = "block";
+			}
+		}
+		else {
+			document.getElementById('errorCheck').style.display = "block";
+		}
+	}
+}
+
+</script>
+</body>
+
+ </html>
